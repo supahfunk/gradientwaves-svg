@@ -5,7 +5,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var settings = {
-    amplitudeX: 100,
+    amplitudeX: 150,
     amplitudeY: 20,
     lines: 30,
     startColor: '#500c44',
@@ -46,9 +46,8 @@ var Path = function () {
                 var x = parseInt(settings.amplitudeX / 2 + Math.random() * settings.amplitudeX / 2);
                 var y = parseInt(rootY + casual * (settings.amplitudeY / 2 + Math.random() * settings.amplitudeY / 2));
                 rootX += x;
-                var maxHeight = Math.random() * settings.amplitudeY;
-                var delay = Math.random() * 10;
-                this.root.push({ x: rootX, y: y, height: rootY, maxHeight: y + maxHeight, casual: casual, delay: delay });
+                var delay = Math.random() * 100;
+                this.root.push({ x: rootX, y: y, height: rootY, casual: casual, delay: delay });
             }
         }
     }, {
@@ -114,19 +113,18 @@ window.dispatchEvent(new Event("resize"));
 
 /* RENDER */
 function render(a) {
+    var curves = mouseDown ? 2 : 4;
+    var velocity = mouseDown ? 4 : 0.8;
     c.width = winW;
     c.height = winH;
 
-    time += 0.05;
-
-    if (mousedown) {
-        time += 0.2;
-    }
+    time += mouseDown ? 0.1 : 0.05;
 
     Paths.forEach(function (path, i) {
         path.root.forEach(function (r, j) {
-            if (j % 2 == 1) {
-                r.y -= Math.sin(time + r.delay) * 0.8 * r.casual;
+            if (j % curves == 1) {
+                var move = Math.sin(time + r.delay) * velocity * r.casual;
+                r.y -= move / 2 - move;
             }
         });
 
@@ -135,32 +133,23 @@ function render(a) {
 
     requestAnimationFrame(render);
 }
-requestAnimationFrame(render);
-
-/* MOUSEMOVE */
-window.addEventListener('mousemove', function (e) {
-    // mouseY = (e.clientY - winH / 2) / (winH / 2) * (mouseDown ? -1 : 1); // from -1 to 1
-    mouseY = (e.clientY - winH) / winH;
-    console.log(mouseY);
-});
+render();
 
 /* MOUSEDOWN */
-window.addEventListener('mousedown', function (e) {
-    mouseDown = true;
+'mousedown touchstart'.split(' ').forEach(function (e) {
+    document.addEventListener(e, function () {
+        mouseDown = true;
+    });
 });
 
 /* MOUSEUP */
-window.addEventListener('mouseup', function (e) {
-    mouseDown = false;
-});
-
-/* MOUSELEAVE */
-window.addEventListener('mouseleave', function (e) {
-    mouseDown = false;
+'mouseup mouseleave touchend'.split(' ').forEach(function (e) {
+    document.addEventListener(e, function () {
+        mouseDown = false;
+    });
 });
 
 /* DATA GUI */
-
 var gui = function datgui() {
     var gui = new dat.GUI();
     dat.GUI.toggleHide();

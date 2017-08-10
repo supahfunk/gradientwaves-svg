@@ -123,18 +123,17 @@ function render(a) {
 render();
 
 /* MOUSEDOWN */
-window.addEventListener('mousedown', function (e) {
-    mouseDown = true;
+('mousedown touchstart').split(' ').forEach(e => {
+  document.addEventListener(e, function() {
+      mouseDown = true;
+  })
 });
 
 /* MOUSEUP */
-window.addEventListener('mouseup', function (e) {
-    mouseDown = false;
-});
-
-/* MOUSELEAVE */
-window.addEventListener('mouseleave', function (e) {
-    mouseDown = false;
+('mouseup mouseleave touchend').split(' ').forEach(e => {
+  document.addEventListener(e, function() {
+      mouseDown = false;
+  })
 });
 
 /* DATA GUI */
