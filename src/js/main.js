@@ -1,5 +1,5 @@
 let settings = {
-    amplitudeX: 100,
+    amplitudeX: 150,
     amplitudeY: 20,
     lines: 30,
     startColor: '#500c44',
@@ -38,9 +38,8 @@ class Path {
             );
             let y = parseInt(rootY + casual * (settings.amplitudeY / 2 + Math.random() * settings.amplitudeY / 2));
             rootX += x;
-            let maxHeight = Math.random() * settings.amplitudeY;
-            let delay = Math.random() * 10;
-            this.root.push({ x: rootX, y: y, height: rootY, maxHeight: y + maxHeight, casual: casual, delay: delay });
+            let delay = Math.random() * 100;
+            this.root.push({ x: rootX, y: y, height: rootY, casual: casual, delay: delay });
         }
     }
 
@@ -101,15 +100,18 @@ window.dispatchEvent(new Event("resize"));
 
 /* RENDER */
 function render(a) {
+    let curves = mouseDown ? 2 : 4;
+    let velocity = mouseDown ? 4 : 0.8;
     c.width = winW;
     c.height = winH;
-
-    time += 0.05;
+    
+    time += mouseDown ? 0.1 : 0.05 ;
 
     Paths.forEach(function (path, i) {
         path.root.forEach(function (r, j) {
-            if (j % 2 == 1) {
-                r.y -= Math.sin(time + r.delay) * 0.8 * r.casual;
+            if (j % curves == 1) {
+                let move = Math.sin(time + r.delay ) * velocity * r.casual;
+                r.y -= (move / 2) - move;
             }
         });
 
@@ -118,15 +120,7 @@ function render(a) {
 
     requestAnimationFrame(render);
 }
-requestAnimationFrame(render);
-
-/* MOUSEMOVE */
-window.addEventListener('mousemove', function (e) {
-    // mouseY = (e.clientY - winH / 2) / (winH / 2) * (mouseDown ? -1 : 1); // from -1 to 1
-    mouseY = (e.clientY - winH) / (winH);
-    console.log(mouseY);
-});
-
+render();
 
 /* MOUSEDOWN */
 window.addEventListener('mousedown', function (e) {
@@ -144,8 +138,7 @@ window.addEventListener('mouseleave', function (e) {
 });
 
 /* DATA GUI */
-
-var gui = (
+const gui = (
     function datgui() {
     var gui = new dat.GUI();
     dat.GUI.toggleHide();

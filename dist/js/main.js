@@ -119,6 +119,10 @@ function render(a) {
 
     time += 0.05;
 
+    if (mousedown) {
+        time += 0.2;
+    }
+
     Paths.forEach(function (path, i) {
         path.root.forEach(function (r, j) {
             if (j % 2 == 1) {
@@ -154,3 +158,27 @@ window.addEventListener('mouseup', function (e) {
 window.addEventListener('mouseleave', function (e) {
     mouseDown = false;
 });
+
+/* DATA GUI */
+
+var gui = function datgui() {
+    var gui = new dat.GUI();
+    dat.GUI.toggleHide();
+    gui.add(settings, "amplitudeX", 20, 100).step(1).onChange(function (newValue) {
+        init();
+    });
+    gui.add(settings, "amplitudeY", 0, 100).step(1).onChange(function (newValue) {
+        init();
+    });
+    gui.add(settings, "lines", 5, 50).step(1).onChange(function (newValue) {
+        init();
+    });
+    gui.addColor(settings, "startColor").onChange(function (newValue) {
+        init();
+    });
+    gui.addColor(settings, "endColor").onChange(function (newValue) {
+        init();
+    });
+
+    return gui;
+}();
