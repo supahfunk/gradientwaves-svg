@@ -1,17 +1,20 @@
+let settings = {
+    amplitudeX: 100,
+    amplitudeY: 20,
+    lines: 30,
+    startColor: '#500c44',
+    endColor: '#b4d455'
+};
+
 const c = document.getElementById("canvas");
 const ctx = c.getContext("2d");
 let winW = window.innerWidth;
 let winH = window.innerHeight;
 let Paths = [];
 let color = [];
-let settings = {
-    amplitudeX: 100,
-    amplitudeY: 10,
-    lines: 30,
-    startColor: '#275863',
-    endColor: '#fafa6e',
-    fromBottom: false
-};
+let mouseY = 0;
+let mouseDown = false;
+let time = 0;
 
 class Path {
     constructor(y, color) {
@@ -24,7 +27,7 @@ class Path {
 
     create() {
         let rootX = 0;
-        let rootY = settings.startY;
+        let rootY = this.y;
 
         this.root = [{ x: rootX, y: rootY }];
 
@@ -33,14 +36,11 @@ class Path {
             let x = parseInt(
                 settings.amplitudeX / 2 + Math.random() * settings.amplitudeX / 2
             );
-            let y = parseInt(
-                rootY +
-                casual *
-                (settings.amplitudeY / 2 + Math.random() * settings.amplitudeY / 2)
-            );
+            let y = parseInt(rootY + casual * (settings.amplitudeY / 2 + Math.random() * settings.amplitudeY / 2));
             rootX += x;
-
-            this.root.push({ x: rootX, y: y });
+            let maxHeight = Math.random() * settings.amplitudeY;
+            let delay = Math.random() * 10;
+            this.root.push({ x: rootX, y: y, height: rootY, maxHeight: y + maxHeight, casual: casual, delay: delay });
         }
     }
 
@@ -50,7 +50,7 @@ class Path {
 
         ctx.lineTo(this.root[0].x, this.root[0].y);
 
-        for (let i = 1; i < this.root.length - 2; i++) {
+        for (let i = 1; i < this.root.length - 1; i++) {
             var x_mid = (this.root[i].x + this.root[i + 1].x) / 2;
             var y_mid = (this.root[i].y + this.root[i + 1].y) / 2;
             var cp_x1 = (x_mid + this.root[i].x) / 2;
@@ -62,6 +62,7 @@ class Path {
         }
 
         const lastPoint = this.root.reverse()[0];
+        this.root.reverse();
         ctx.lineTo(lastPoint.x, lastPoint.y);
         ctx.lineTo(winW, winH);
         ctx.fillStyle = this.color;
@@ -88,9 +89,6 @@ function init() {
     }
 }
 
-/* REGENERATE */
-window.addEventListener('click', init);
-
 /* WIN RESIZE */
 window.addEventListener('resize', function () {
     winW = window.innerWidth;
@@ -100,3 +98,47 @@ window.addEventListener('resize', function () {
     init();
 });
 window.dispatchEvent(new Event("resize"));
+
+/* RENDER */
+function render(a) {
+    c.width = winW;
+    c.height = winH;
+
+    time += 0.05;
+
+    Paths.forEach(function (path, i) {
+        path.root.forEach(function (r, j) {
+            if (j % 2 == 1) {
+                r.y -= Math.sin(time + r.delay) * 0.8 * r.casual;
+            }
+        });
+
+        path.draw();
+    });
+
+    requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+
+/* MOUSEMOVE */
+window.addEventListener('mousemove', function (e) {
+    // mouseY = (e.clientY - winH / 2) / (winH / 2) * (mouseDown ? -1 : 1); // from -1 to 1
+    mouseY = (e.clientY - winH) / (winH);
+    console.log(mouseY);
+});
+
+
+/* MOUSEDOWN */
+window.addEventListener('mousedown', function (e) {
+    mouseDown = true;
+});
+
+/* MOUSEUP */
+window.addEventListener('mouseup', function (e) {
+    mouseDown = false;
+});
+
+/* MOUSELEAVE */
+window.addEventListener('mouseleave', function (e) {
+    mouseDown = false;
+});

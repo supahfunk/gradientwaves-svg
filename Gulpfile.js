@@ -2,6 +2,7 @@
 
 var gulp = require('gulp'),
     plumber = require('gulp-plumber'),
+    babel = require('gulp-babel'),
     sass = require('gulp-sass'),
     rename = require("gulp-rename"),
     sourcemaps = require('gulp-sourcemaps'),
@@ -11,8 +12,7 @@ var gulp = require('gulp'),
     webserver = require('gulp-webserver'),
     header = require('gulp-header'),
     gulpIncludeTemplate = require("gulp-include-template"),
-    tfs = require('gulp-tfs'),
-    refresh = require('gulp-refresh');
+    tfs = require('gulp-tfs');
 
 
 /***********************
@@ -47,8 +47,7 @@ gulp.task('sass', function () {
         )
         .pipe(sourcemaps.write())
         .pipe(rename({ dirname: '' }))
-        .pipe(gulp.dest('./dist/css'))
-        .pipe(refresh());
+        .pipe(gulp.dest('./dist/css'));
     // minify
     //.pipe(cssmin())
     //.pipe(rename({ suffix: '.min' }))
@@ -60,8 +59,7 @@ gulp.task('sass', function () {
 *** SASS WATCH ***
 ******************/
 gulp.task('sass:watch', function () {
-    var watcher = gulp.watch('./sass/**/*.scss', ['sass']);
-    refresh.listen();
+    var watcher = gulp.watch('./src/scss/main.scss', ['sass']);
     watcher.on('change', function (e) {
         console.log('watcher.on.change type: ' + e.type + ' path: ' + e.path);
     });
@@ -73,12 +71,12 @@ gulp.task('sass:watch', function () {
 *** JS ***
 **********/
 gulp.task('js', function () {
-    console.log('MINIFYING JS');
-    return gulp.src('./js/main.js')
-        // minify
-        .pipe(uglify())
-        .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest('./js'));
+    console.log('COMPILING JS');
+    gulp.src('src/js/main.js')
+        .pipe(babel({
+            presets: ['env']
+        }))
+        .pipe(gulp.dest('dist/js'))
 });
 
 
@@ -86,7 +84,7 @@ gulp.task('js', function () {
 *** JS WATCH ***
 ****************/
 gulp.task('js:watch', function () {
-    var watcher = gulp.watch('./js/main.js', ['js']);
+    var watcher = gulp.watch('./dist/js/main.js', ['js']);
     watcher.on('change', function (e) {
         console.log('watcher.on.change type: ' + e.type + ' path: ' + e.path);
     });
@@ -105,11 +103,12 @@ gulp.task('webserver', function () {
             host: 'localhost',
             port: 8080,
             open: 'index.html'
-        }));
+        })
+    );
 });
 
 
 /************
 *** START ***
 *************/
-gulp.task('start', ['webserver', 'sass', 'sass:watch']);
+gulp.task('start', ['webserver', 'sass', 'sass:watch', 'js', 'js:watch']);

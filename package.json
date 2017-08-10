@@ -9,9 +9,13 @@
   "author": "supah",
   "license": "ISC",
   "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
     "es6-promise": "^4.0.5",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.1",
+    "gulp-babel": "^7.0.0",
     "gulp-cssmin": "^0.1.7",
     "gulp-header": "^1.8.8",
     "gulp-include-template": "^0.2.1",
