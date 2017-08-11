@@ -50,14 +50,21 @@ class Path {
         ctx.lineTo(this.root[0].x, this.root[0].y);
 
         for (let i = 1; i < this.root.length - 1; i++) {
-            var x_mid = (this.root[i].x + this.root[i + 1].x) / 2;
-            var y_mid = (this.root[i].y + this.root[i + 1].y) / 2;
-            var cp_x1 = (x_mid + this.root[i].x) / 2;
-            var cp_y1 = (y_mid + this.root[i].y) / 2;
-            var cp_x2 = (x_mid + this.root[i + 1].x) / 2;
-            var cp_y2 = (y_mid + this.root[i + 1].y) / 2;
-            ctx.quadraticCurveTo(cp_x1, this.root[i].y, x_mid, y_mid);
-            ctx.quadraticCurveTo(cp_x2, this.root[i + 1].y, this.root[i + 1].x, this.root[i + 1].y);
+
+            let x = this.root[i].x;
+            let y = this.root[i].y;
+            let nextX = this.root[i + 1].x;
+            let nextY = this.root[i + 1].y;
+
+            let xMid = (x + this.root[i + 1].x) / 2;nextX
+            let yMid = (y + nextY) / 2;
+            let cpX1 = (xMid + x) / 2;
+            let cpY1 = (yMid + y) / 2;
+            let cpX2 = (xMid + this.root[i + 1].x) / 2;
+            let cpY2 = (yMid + nextY) / 2;
+            
+            ctx.quadraticCurveTo(cpX1, y, xMid, yMid);
+            ctx.quadraticCurveTo(cpX2, nextY, this.root[i + 1].x, nextY);
         }
 
         const lastPoint = this.root.reverse()[0];
@@ -100,6 +107,7 @@ window.dispatchEvent(new Event("resize"));
 
 /* RENDER */
 function render(a) {
+    /*
     let curves = mouseDown ? 2 : 4;
     let velocity = mouseDown ? 4 : 0.8;
     c.width = winW;
@@ -117,7 +125,7 @@ function render(a) {
 
         path.draw();
     });
-
+    */
     requestAnimationFrame(render);
 }
 render();
@@ -133,6 +141,13 @@ render();
 ('mouseup mouseleave touchend').split(' ').forEach(e => {
   document.addEventListener(e, function() {
       mouseDown = false;
+  })
+});
+
+/* MOUSEMOVE */
+('mousemove touchmove').split(' ').forEach(e => {
+  document.addEventListener(e, function(e) {
+      mouseY = e.clientY || e.touches[0].clientY;
   })
 });
 
