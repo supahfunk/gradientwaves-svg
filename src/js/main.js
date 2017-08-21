@@ -15,6 +15,8 @@ let color = [];
 let mouseY = 0;
 let mouseDown = false;
 let time = 0;
+let curves;
+let velocity;
 
 class Path {
     constructor(y, color) {
@@ -56,15 +58,15 @@ class Path {
             let nextX = this.root[i + 1].x;
             let nextY = this.root[i + 1].y;
 
-            let xMid = (x + this.root[i + 1].x) / 2;nextX
+            let xMid = (x + nextX) / 2;
             let yMid = (y + nextY) / 2;
             let cpX1 = (xMid + x) / 2;
             let cpY1 = (yMid + y) / 2;
-            let cpX2 = (xMid + this.root[i + 1].x) / 2;
+            let cpX2 = (xMid + nextX) / 2;
             let cpY2 = (yMid + nextY) / 2;
-            
+
             ctx.quadraticCurveTo(cpX1, y, xMid, yMid);
-            ctx.quadraticCurveTo(cpX2, nextY, this.root[i + 1].x, nextY);
+            ctx.quadraticCurveTo(cpX2, nextY, nextX, nextY);
         }
 
         const lastPoint = this.root.reverse()[0];
@@ -106,12 +108,12 @@ window.addEventListener('resize', function () {
 window.dispatchEvent(new Event("resize"));
 
 /* RENDER */
-function render(a) {
-    /*
-    let curves = mouseDown ? 2 : 4;
-    let velocity = mouseDown ? 4 : 0.8;
+function render() {
     c.width = winW;
     c.height = winH;
+    
+    curves = mouseDown ? 2 : 4;
+    velocity = mouseDown ? 6 : 0.8;
     
     time += mouseDown ? 0.1 : 0.05 ;
 
@@ -121,11 +123,15 @@ function render(a) {
                 let move = Math.sin(time + r.delay ) * velocity * r.casual;
                 r.y -= (move / 2) - move;
             }
+            if (j + 1 % curves == 0) {
+                let move = Math.sin(time + r.delay ) * velocity * r.casual;
+                r.x += (move / 2) - move / 10;
+            }
         });
 
         path.draw();
     });
-    */
+
     requestAnimationFrame(render);
 }
 render();

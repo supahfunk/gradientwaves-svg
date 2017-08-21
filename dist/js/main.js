@@ -21,6 +21,8 @@ var color = [];
 var mouseY = 0;
 var mouseDown = false;
 var time = 0;
+var curves = void 0;
+var velocity = void 0;
 
 var Path = function () {
     function Path(y, color) {
@@ -59,14 +61,21 @@ var Path = function () {
             ctx.lineTo(this.root[0].x, this.root[0].y);
 
             for (var i = 1; i < this.root.length - 1; i++) {
-                var x_mid = (this.root[i].x + this.root[i + 1].x) / 2;
-                var y_mid = (this.root[i].y + this.root[i + 1].y) / 2;
-                var cp_x1 = (x_mid + this.root[i].x) / 2;
-                var cp_y1 = (y_mid + this.root[i].y) / 2;
-                var cp_x2 = (x_mid + this.root[i + 1].x) / 2;
-                var cp_y2 = (y_mid + this.root[i + 1].y) / 2;
-                ctx.quadraticCurveTo(cp_x1, this.root[i].y, x_mid, y_mid);
-                ctx.quadraticCurveTo(cp_x2, this.root[i + 1].y, this.root[i + 1].x, this.root[i + 1].y);
+
+                var x = this.root[i].x;
+                var y = this.root[i].y;
+                var nextX = this.root[i + 1].x;
+                var nextY = this.root[i + 1].y;
+
+                var xMid = (x + nextX) / 2;
+                var yMid = (y + nextY) / 2;
+                var cpX1 = (xMid + x) / 2;
+                var cpY1 = (yMid + y) / 2;
+                var cpX2 = (xMid + nextX) / 2;
+                var cpY2 = (yMid + nextY) / 2;
+
+                ctx.quadraticCurveTo(cpX1, y, xMid, yMid);
+                ctx.quadraticCurveTo(cpX2, nextY, nextX, nextY);
             }
 
             var lastPoint = this.root.reverse()[0];
@@ -112,11 +121,12 @@ window.addEventListener('resize', function () {
 window.dispatchEvent(new Event("resize"));
 
 /* RENDER */
-function render(a) {
-    var curves = mouseDown ? 2 : 4;
-    var velocity = mouseDown ? 4 : 0.8;
+function render() {
     c.width = winW;
     c.height = winH;
+
+    curves = mouseDown ? 2 : 4;
+    velocity = mouseDown ? 6 : 0.8;
 
     time += mouseDown ? 0.1 : 0.05;
 
@@ -125,6 +135,10 @@ function render(a) {
             if (j % curves == 1) {
                 var move = Math.sin(time + r.delay) * velocity * r.casual;
                 r.y -= move / 2 - move;
+            }
+            if (j + 1 % curves == 0) {
+                var _move = Math.sin(time + r.delay) * velocity * r.casual;
+                r.x += _move / 2 - _move / 10;
             }
         });
 
@@ -146,6 +160,13 @@ render();
 'mouseup mouseleave touchend'.split(' ').forEach(function (e) {
     document.addEventListener(e, function () {
         mouseDown = false;
+    });
+});
+
+/* MOUSEMOVE */
+'mousemove touchmove'.split(' ').forEach(function (e) {
+    document.addEventListener(e, function (e) {
+        mouseY = e.clientY || e.touches[0].clientY;
     });
 });
 

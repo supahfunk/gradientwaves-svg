@@ -74,7 +74,7 @@ gulp.task('js', function () {
     console.log('COMPILING JS');
     gulp.src('src/js/main.js')
         .pipe(babel({
-            presets: ['env']
+            presets: ["es2015"]
         }))
         .pipe(gulp.dest('dist/js'))
 });
