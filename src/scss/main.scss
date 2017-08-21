@@ -10,30 +10,15 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-canvas {
+svg {
     width: 100vw;
     height: 100vh;
-}
 
-h1 {
-    position: absolute;
-    z-index: 1;
-    width: 100%;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    mix-blend-mode: overlay;
-    color: rgba(0, 0, 0, .3);
-    line-height: 0;
-    font-size: 16px;
-    letter-spacing: 4px;
-    text-align: center;
-    text-transform: uppercase;
-    transform: translateY(-50%);
-    cursor: pointer;
-    transition: color .2s ease-in-out;
+    .path {
+        fill: none;
+    }
 
-    &:hover {
-        color: rgba(0, 0, 0, .8);
+    .circle {
+        fill: #f00;
     }
 }

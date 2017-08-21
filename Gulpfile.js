@@ -84,7 +84,7 @@ gulp.task('js', function () {
 *** JS WATCH ***
 ****************/
 gulp.task('js:watch', function () {
-    var watcher = gulp.watch('./dist/js/main.js', ['js']);
+    var watcher = gulp.watch('./src/js/main.js', ['js']);
     watcher.on('change', function (e) {
         console.log('watcher.on.change type: ' + e.type + ' path: ' + e.path);
     });

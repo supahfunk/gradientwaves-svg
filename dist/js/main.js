@@ -4,191 +4,140 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/*--------------------------------------------------
+VARS
+--------------------------------------------------*/
+var svg = document.getElementById('svg');
+var winW = window.innerWidth,
+    winH = window.innerHeight,
+    colors = [];
+
+/*--------------------------------------------------
+SETTINGS
+--------------------------------------------------*/
 var settings = {
-    amplitudeX: 150,
+    amplitudeX: 100,
     amplitudeY: 20,
-    lines: 30,
+    lines: 20,
     startColor: '#500c44',
     endColor: '#b4d455'
+
+    /*--------------------------------------------------
+    PATH
+    --------------------------------------------------*/
 };
-
-var c = document.getElementById("canvas");
-var ctx = c.getContext("2d");
-var winW = window.innerWidth;
-var winH = window.innerHeight;
-var Paths = [];
-var color = [];
-var mouseY = 0;
-var mouseDown = false;
-var time = 0;
-var curves = void 0;
-var velocity = void 0;
-
 var Path = function () {
-    function Path(y, color) {
+    function Path(y, fill) {
         _classCallCheck(this, Path);
 
-        this.y = y;
-        this.color = color;
-        this.root = [];
-        this.create();
-        this.draw();
+        this.rootY = y;
+        this.fill = fill;
     }
 
     _createClass(Path, [{
-        key: 'create',
-        value: function create() {
-            var rootX = 0;
-            var rootY = this.y;
+        key: 'createRoot',
+        value: function createRoot() {
+            this.root = [];
 
-            this.root = [{ x: rootX, y: rootY }];
+            var x = 0;
+            var y = 0;
+            var rootY = this.rootY;
+            var upSideDown = 0;
 
-            while (rootX < winW) {
-                var casual = Math.random() > 0.5 ? 1 : -1;
-                var x = parseInt(settings.amplitudeX / 2 + Math.random() * settings.amplitudeX / 2);
-                var y = parseInt(rootY + casual * (settings.amplitudeY / 2 + Math.random() * settings.amplitudeY / 2));
-                rootX += x;
-                var delay = Math.random() * 100;
-                this.root.push({ x: rootX, y: y, height: rootY, casual: casual, delay: delay });
+            this.root.push({ x: 0, y: rootY });
+
+            while (x < winW) {
+                upSideDown = !upSideDown;
+                var value = upSideDown ? 1 : -1;
+                x += parseInt(Math.random() * settings.amplitudeX / 2 + settings.amplitudeX / 2);
+                y = parseInt(Math.random() * settings.amplitudeY / 2 + settings.amplitudeY / 2) * value + rootY;
+                console.log(upSideDown);
+                this.root.push({ x: x, y: y });
             }
         }
     }, {
-        key: 'draw',
-        value: function draw() {
-            ctx.beginPath();
-            ctx.moveTo(0, winH);
+        key: 'createCircles',
+        value: function createCircles() {
+            var fill = this.fill;
+            this.root.forEach(function (key, obj) {
+                var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('r', 2);
+                circle.setAttribute('cx', key.x);
+                circle.setAttribute('cy', key.y);
+                circle.setAttribute('fill', fill);
+                svg.appendChild(circle);
+            });
+        }
+    }, {
+        key: 'createPath',
+        value: function createPath() {
+            var stroke = this.fill;
+            var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('stroke', stroke);
+            path.classList.add('path');
 
-            ctx.lineTo(this.root[0].x, this.root[0].y);
+            // first point
+            var d = 'M ' + this.root[0].x + ' ' + this.root[0].y;
 
             for (var i = 1; i < this.root.length - 1; i++) {
+                var letter = i == 1 ? 'c' : 's';
 
-                var x = this.root[i].x;
-                var y = this.root[i].y;
-                var nextX = this.root[i + 1].x;
-                var nextY = this.root[i + 1].y;
+                var p = this.root[i];
+                var pPrev = this.root[i - 1];
+                var pNext = this.root[i + 1];
 
-                var xMid = (x + nextX) / 2;
-                var yMid = (y + nextY) / 2;
-                var cpX1 = (xMid + x) / 2;
-                var cpY1 = (yMid + y) / 2;
-                var cpX2 = (xMid + nextX) / 2;
-                var cpY2 = (yMid + nextY) / 2;
+                var x1 = (p.x - pPrev.x) / 2;
+                var x2 = (pNext.x - p.x) / 2;
+                var x = p.x;
+                var y = p.y - this.rootY;
 
-                ctx.quadraticCurveTo(cpX1, y, xMid, yMid);
-                ctx.quadraticCurveTo(cpX2, nextY, nextX, nextY);
+                if (letter == 'c') {
+                    d += ' ' + letter + x2 + ' ' + y + ', ' + x1 + ' ' + y + ', ' + x + ' ' + y;
+                } else {
+                    d += ' ' + letter + x1 + ' ' + y + ', ' + x + ' ' + y;
+                }
             }
 
-            var lastPoint = this.root.reverse()[0];
-            this.root.reverse();
-            ctx.lineTo(lastPoint.x, lastPoint.y);
-            ctx.lineTo(winW, winH);
-            ctx.fillStyle = this.color;
-            ctx.fill();
-            ctx.closePath();
+            path.setAttribute('d', d);
+
+            svg.appendChild(path);
         }
     }]);
 
     return Path;
 }();
 
-/* INIT */
+;
 
-
-var path = void 0;
+/*--------------------------------------------------
+INIT
+--------------------------------------------------*/
 function init() {
-    c.width = winW;
-    c.height = winH;
-    Paths = [];
+    colors = chroma.scale([settings.startColor, settings.endColor]).mode('lch').colors(settings.lines);
 
-    color = chroma.scale([settings.startColor, settings.endColor]).mode('lch').colors(settings.lines);
-
-    document.body.style = 'background: ' + settings.startColor;
+    svg.innerHTML = '';
 
     for (var i = 0; i < settings.lines; i++) {
-        Paths.push(new Path(winH / settings.lines * i, color[i]));
-        settings.startY = winH / settings.lines * i;
+        var path = new Path(winH / settings.lines * i, colors[i]);
+        path.createRoot();
+        path.createPath();
     }
-}
+};
+init();
 
-/* WIN RESIZE */
+/*--------------------------------------------------
+RENDER
+--------------------------------------------------*/
+function render() {
+    requestAnimationFrame(render);
+};
+render();
+
+/*--------------------------------------------------
+WIN RESIZE
+--------------------------------------------------*/
 window.addEventListener('resize', function () {
     winW = window.innerWidth;
     winH = window.innerHeight;
-    c.width = winW;
-    c.height = winH;
     init();
 });
-window.dispatchEvent(new Event("resize"));
-
-/* RENDER */
-function render() {
-    c.width = winW;
-    c.height = winH;
-
-    curves = mouseDown ? 2 : 4;
-    velocity = mouseDown ? 6 : 0.8;
-
-    time += mouseDown ? 0.1 : 0.05;
-
-    Paths.forEach(function (path, i) {
-        path.root.forEach(function (r, j) {
-            if (j % curves == 1) {
-                var move = Math.sin(time + r.delay) * velocity * r.casual;
-                r.y -= move / 2 - move;
-            }
-            if (j + 1 % curves == 0) {
-                var _move = Math.sin(time + r.delay) * velocity * r.casual;
-                r.x += _move / 2 - _move / 10;
-            }
-        });
-
-        path.draw();
-    });
-
-    requestAnimationFrame(render);
-}
-render();
-
-/* MOUSEDOWN */
-'mousedown touchstart'.split(' ').forEach(function (e) {
-    document.addEventListener(e, function () {
-        mouseDown = true;
-    });
-});
-
-/* MOUSEUP */
-'mouseup mouseleave touchend'.split(' ').forEach(function (e) {
-    document.addEventListener(e, function () {
-        mouseDown = false;
-    });
-});
-
-/* MOUSEMOVE */
-'mousemove touchmove'.split(' ').forEach(function (e) {
-    document.addEventListener(e, function (e) {
-        mouseY = e.clientY || e.touches[0].clientY;
-    });
-});
-
-/* DATA GUI */
-var gui = function datgui() {
-    var gui = new dat.GUI();
-    dat.GUI.toggleHide();
-    gui.add(settings, "amplitudeX", 20, 100).step(1).onChange(function (newValue) {
-        init();
-    });
-    gui.add(settings, "amplitudeY", 0, 100).step(1).onChange(function (newValue) {
-        init();
-    });
-    gui.add(settings, "lines", 5, 50).step(1).onChange(function (newValue) {
-        init();
-    });
-    gui.addColor(settings, "startColor").onChange(function (newValue) {
-        init();
-    });
-    gui.addColor(settings, "endColor").onChange(function (newValue) {
-        init();
-    });
-
-    return gui;
-}();
