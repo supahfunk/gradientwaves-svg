@@ -3,6 +3,7 @@
 var gulp = require('gulp'),
     plumber = require('gulp-plumber'),
     babel = require('gulp-babel'),
+    babel_polyfill = require('babel-polyfill'),
     sass = require('gulp-sass'),
     rename = require("gulp-rename"),
     sourcemaps = require('gulp-sourcemaps'),
@@ -74,7 +75,7 @@ gulp.task('js', function () {
     console.log('COMPILING JS');
     gulp.src('src/js/main.js')
         .pipe(babel({
-            presets: ["es2015"]
+            presets: ['es2015']
         }))
         .pipe(gulp.dest('dist/js'))
 });
