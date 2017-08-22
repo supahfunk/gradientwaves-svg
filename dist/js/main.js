@@ -4,9 +4,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/*--------------------------------------------------
+/*--------------------
 SETTINGS
---------------------------------------------------*/
+--------------------*/
 var settings = {
     amplitudeX: 100,
     amplitudeY: 20,
@@ -22,9 +22,9 @@ var settings = {
     fill: true,
     crazyness: false
 
-    /*--------------------------------------------------
+    /*--------------------
     VARS
-    --------------------------------------------------*/
+    --------------------*/
 };var svg = document.getElementById('svg'),
     winW = window.innerWidth,
     winH = window.innerHeight,
@@ -39,9 +39,9 @@ var settings = {
     endColor = void 0,
     gui = void 0;
 
-/*--------------------------------------------------
+/*--------------------
 PATH
---------------------------------------------------*/
+--------------------*/
 
 var Path = function () {
     function Path(y, fill, offsetX) {
@@ -182,9 +182,9 @@ var Path = function () {
 
 ;
 
-/*--------------------------------------------------
+/*--------------------
 INIT
---------------------------------------------------*/
+--------------------*/
 function init() {
     // Overflow
     overflow = Math.abs(settings.lines * settings.offsetX);
@@ -221,18 +221,18 @@ function init() {
 };
 init();
 
-/*--------------------------------------------------
+/*--------------------
 WIN RESIZE
---------------------------------------------------*/
+--------------------*/
 window.addEventListener('resize', function () {
     winW = window.innerWidth;
     winH = window.innerHeight;
     init();
 });
 
-/*--------------------------------------------------
+/*--------------------
 DAT GUI
---------------------------------------------------*/
+--------------------*/
 function datgui() {
     gui = new dat.GUI();
 
@@ -271,9 +271,9 @@ function datgui() {
 }
 datgui();
 
-/*--------------------------------------------------
+/*--------------------
 RANDOMIZE
---------------------------------------------------*/
+--------------------*/
 function _randomize() {
     settings = {
         lines: parseInt(5 + Math.random() * 45),

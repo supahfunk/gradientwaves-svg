@@ -1,6 +1,6 @@
 'use strict';
 
-var gulp = require('gulp'),
+const gulp = require('gulp'),
     plumber = require('gulp-plumber'),
     babel = require('gulp-babel'),
     babel_polyfill = require('babel-polyfill'),
@@ -10,6 +10,7 @@ var gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     cssmin = require('gulp-cssmin'),
     uglify = require('gulp-uglify'),
+    imagemin = require('gulp-imagemin'),
     webserver = require('gulp-webserver'),
     header = require('gulp-header'),
     gulpIncludeTemplate = require("gulp-include-template"),
@@ -94,6 +95,33 @@ gulp.task('js:watch', function () {
 
 
 /****************
+*** IMAGE MIN ***
+*****************/
+gulp.task('imagemin', () =>
+gulp.src('src/img/*')
+    .pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({plugins: [{removeViewBox: true}]})
+    ]))
+    .pipe(gulp.dest('dist/img'))
+);
+
+
+/**********************
+*** IMAGE MIN WATCH ***
+***********************/
+gulp.task('imagemin:watch', function () {
+    var watcher = gulp.watch('./src/img/*', ['imagemin']);
+    watcher.on('change', function (e) {
+        console.log('watcher.on.change type: ' + e.type + ' path: ' + e.path);
+    });
+    return watcher;
+});
+
+
+/****************
 *** WEBSERVER ***
 *****************/
 gulp.task('webserver', function () {
@@ -112,4 +140,4 @@ gulp.task('webserver', function () {
 /************
 *** START ***
 *************/
-gulp.task('start', ['webserver', 'sass', 'sass:watch', 'js', 'js:watch']);
+gulp.task('start', ['webserver', 'sass', 'sass:watch', 'js', 'js:watch', 'imagemin', 'imagemin:watch']);

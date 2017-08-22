@@ -5,11 +5,14 @@
 body {
     padding: 0;
     margin: 0;
+    height: 100vh;
     overflow: hidden;
     font-family: 'Roboto', sans-serif;
+    background: url(/dist/img/bg-gradient-wave.png) repeat center / cover;
 }
 
 svg {
+    display: none;
     width: 100vw;
     height: 100vh;
 
@@ -29,6 +32,6 @@ svg {
     }
 
     .circle {
-        fill: #f00;
+        fill: #fff;
     }
 }
