@@ -37,7 +37,7 @@ var settings = {
     overflow = void 0,
     startColor = void 0,
     endColor = void 0,
-    time = void 0;
+    gui = void 0;
 
 /*--------------------------------------------------
 PATH
@@ -233,8 +233,8 @@ window.addEventListener('resize', function () {
 /*--------------------------------------------------
 DAT GUI
 --------------------------------------------------*/
-function gui() {
-    var gui = new dat.GUI();
+function datgui() {
+    gui = new dat.GUI();
 
     // Settings
     var guiSettings = gui.addFolder('Settings');
@@ -252,13 +252,45 @@ function gui() {
     guiStartColor.add(settings, 'hueStartColor', 0, 360).step(1).onChange(init);
     guiStartColor.add(settings, 'saturationStartColor', 0, 100).step(1).onChange(init);
     guiStartColor.add(settings, 'lightnessStartColor', 0, 100).step(1).onChange(init);
+    guiStartColor.open();
 
     // End Color
     var guiEndColor = gui.addFolder('End Color');
     guiEndColor.add(settings, 'hueEndColor', 0, 360).step(1).onChange(init);
     guiEndColor.add(settings, 'saturationEndColor', 0, 100).step(1).onChange(init);
     guiEndColor.add(settings, 'lightnessEndColor', 0, 100).step(1).onChange(init);
+    guiEndColor.open();
+
+    // Randomize
+    var guiRandomize = { randomize: function randomize() {
+            _randomize();
+        } };
+    gui.add(guiRandomize, 'randomize');
 
     return gui;
 }
-gui();
+datgui();
+
+/*--------------------------------------------------
+RANDOMIZE
+--------------------------------------------------*/
+function _randomize() {
+    settings = {
+        lines: parseInt(5 + Math.random() * 45),
+        amplitudeX: parseInt(20 + Math.random() * 300),
+        amplitudeY: parseInt(Math.random() * 200),
+        hueStartColor: parseInt(Math.random() * 360),
+        saturationStartColor: 74,
+        lightnessStartColor: 67,
+        hueEndColor: parseInt(Math.random() * 360),
+        saturationEndColor: 90,
+        lightnessEndColor: 14,
+        smoothness: 1 + parseInt(Math.random() * 9),
+        offsetX: parseInt(-20 + Math.random() * 40),
+        fill: Math.random() * 1 > 0.3 ? true : false,
+        crazyness: Math.random() * 1 > 0.9 ? true : false
+    };
+    init();
+    gui.destroy();
+    datgui();
+}
